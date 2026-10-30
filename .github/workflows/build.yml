@@ -5,9 +5,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,7 +38,7 @@ jobs:
           gradle-version: "8.9"
 
       - name: Build APK release
-        run: gradle assembleRelease --no-daemon --stacktrace -PappVersionCode=${{ github.run_number }} -PappVersionName=1.${{ github.run_number }}
+        run: gradle assembleRelease --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -49,10 +46,3 @@ jobs:
           name: Wavetune-apk
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
-
-      - name: Buat release (untuk fitur Cek pembaruan)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cp app/build/outputs/apk/release/app-release.apk Wavetune.apk
-          gh release create "v${{ github.run_number }}" Wavetune.apk --repo "${{ github.repository }}" --title "Wavetune 1.${{ github.run_number }}" --notes "Pembaruan otomatis. Config terbaru sudah ikut di dalam APK." --latest
